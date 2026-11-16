@@ -1,0 +1,44 @@
+{
+  "unavailableCodes": [
+    {
+      "name": "Break",
+      "description": "Short break",
+      "paid": true
+    },
+    {
+      "name": "Lunch",
+      "description": "Meal break",
+      "paid": false
+    },
+    {
+      "name": "Training",
+      "description": "Scheduled training",
+      "paid": true
+    },
+    {
+      "name": "Coaching",
+      "description": "One-to-one coaching",
+      "paid": true
+    },
+    {
+      "name": "Meeting",
+      "description": "Team meeting",
+      "paid": true
+    },
+    {
+      "name": "System Issue",
+      "description": "Tools not working",
+      "paid": true
+    },
+    {
+      "name": "Wellbeing Break",
+      "description": "Short pause after a distressing call",
+      "paid": true
+    },
+    {
+      "name": "Admin Work",
+      "description": "Follow-up work",
+      "paid": true
+    }
+  ]
+}

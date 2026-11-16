@@ -1,0 +1,161 @@
+# Studio script design: front_door
+# One script serves every phone number. The point of contact passes two
+# parameters (brandName, line). That is why we do not build one script per number.
+script: front_door
+kind: inbound_voice
+description: Entry point for all Kestrel phone numbers. Checks CAT mode, announces recording, routes by line and opening hours.
+parameters: [brandName, line]
+sensitiveVariables: []
+variables:
+  contactIdText: "{contactId}"
+nodes:
+  begin:
+    type: Begin
+    why: Every script starts here. Nothing happens before the next node.
+    next: cat_switch
+  cat_switch:
+    type: Hours
+    profile: KI CAT Switch
+    why: >
+      First decision of every call. The profile never closes. Its Emergency flag is the
+      catastrophe switch. One flag change at the Business Unit moves ALL numbers into
+      CAT mode in seconds, with no script edit and no publish.
+    branches:
+      emergency: run_cat
+      open: recording_notice
+      closed: recording_notice
+      holiday: recording_notice
+  run_cat:
+    type: Run
+    script: cat_surge
+    why: CAT mode has its own script so it can be tested and rolled back on its own.
+    next: end_call
+  recording_notice:
+    type: Play
+    text: "Thanks for calling {brandName}. This call may be recorded for quality and training."
+    why: Recording notice before anything is said or captured. Required by privacy and call recording expectations.
+    next: line_router
+  line_router:
+    type: Case
+    variable: line
+    why: One script, many lines. The point of contact parameter chooses the branch.
+    branches:
+      claims: claims_menu
+      servicing: hours_servicing
+      assistance: queue_assistance
+      broker: hours_broker
+      care: run_care
+      cat: run_cat
+      default: claims_menu
+  hours_servicing:
+    type: Hours
+    profile: KI Servicing
+    why: Servicing is business hours only. After hours a caller is told the hours and offered the claims line.
+    branches:
+      open: servicing_menu
+      closed: closed_servicing
+      holiday: closed_servicing
+      emergency: servicing_menu
+  hours_broker:
+    type: Hours
+    profile: KI Broker
+    why: Broker desk has its own hours.
+    branches:
+      open: queue_broker
+      closed: closed_servicing
+      holiday: closed_servicing
+      emergency: queue_broker
+  closed_servicing:
+    type: Play
+    text: "Our servicing team is closed right now. Claims and roadside assistance are open every day, all day. Please call again in business hours, or say or press 1 to be connected to claims."
+    why: Plain words. States the hours, offers a real alternative, never leaves a dead end.
+    next: closed_menu
+  closed_menu:
+    type: Menu
+    prompt: "Press 1 for claims. Or hang up and call back in business hours."
+    timeoutSeconds: 8
+    options:
+      "1": claims_menu
+    onTimeout: end_call
+    onInvalid: end_call
+    why: Short menu. No more than 4 options anywhere in this design.
+  claims_menu:
+    type: Menu
+    prompt: "If anyone is hurt or in danger, hang up and call triple zero. To make a new claim, press 1. To check a claim, press 2. For anything else, press 3."
+    timeoutSeconds: 8
+    options:
+      "1": run_claims_fnol
+      "2": run_claims_status
+      "3": queue_general
+      "0": queue_general
+    onTimeout: queue_general
+    onInvalid: queue_general
+    why: Safety message first. A timeout or a wrong key goes to a PERSON, never to a loop.
+  servicing_menu:
+    type: Menu
+    prompt: "For renewals, payments or changes to your policy, press 1. For a general question, press 2. To speak to a person, press 0."
+    timeoutSeconds: 8
+    options:
+      "1": run_verify
+      "2": run_ai
+      "0": queue_servicing
+    onTimeout: queue_servicing
+    onInvalid: queue_servicing
+    why: General questions go to the AI assistant. Anything about the person's own policy goes to a person.
+  run_claims_fnol:
+    type: Run
+    script: claims_self_service
+    parameters: { mode: fnol }
+    next: end_call
+  run_claims_status:
+    type: Run
+    script: claims_self_service
+    parameters: { mode: status }
+    next: end_call
+  run_verify:
+    type: Run
+    script: verify_caller
+    why: >
+      Verify BEFORE the queue so the agent's screen already shows verified or not verified
+      and the customer is not asked again. A failed check still reaches a person.
+    next: queue_servicing
+  run_ai:
+    type: Run
+    script: ai_assist
+    next: end_call
+  run_care:
+    type: Run
+    script: care_path
+    next: end_call
+  queue_general:
+    type: Reqagent
+    skill: Claims FNOL
+    timeoutSeconds: 180
+    onTimeout: offer_callback
+    why: Fallback destination for every timeout in this script.
+    next: end_call
+  queue_servicing:
+    type: Reqagent
+    skill: Servicing General
+    timeoutSeconds: 180
+    onTimeout: offer_callback
+    next: end_call
+  queue_assistance:
+    type: Reqagent
+    skill: Roadside Assistance
+    timeoutSeconds: 60
+    onTimeout: queue_general
+    why: A person stuck at the roadside should never wait long. After 60 seconds the call widens to claims agents.
+    next: end_call
+  queue_broker:
+    type: Reqagent
+    skill: Broker Desk
+    timeoutSeconds: 180
+    onTimeout: offer_callback
+    next: end_call
+  offer_callback:
+    type: QueueCallback
+    why: Better than a long wait. The caller keeps their place in line.
+    next: end_call
+  end_call:
+    type: Hangup

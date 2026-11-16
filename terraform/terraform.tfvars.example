@@ -1,0 +1,18 @@
+# Copy to terraform.tfvars (which .gitignore excludes). Nothing here is secret,
+# but your own IP address is personal, so keep it out of commits.
+
+prefix      = "ki"
+environment = "lab"
+
+# The public IP ranges CXone calls from. Ask NICE or your carrier. Leave empty until you have them.
+cxone_egress_cidrs = []
+
+# Your own public IP while you test with curl or Postman, written as x.x.x.x/32. Remove it afterwards.
+extra_allowed_cidrs = []
+
+alarm_email = ""
+
+# Cheaper and simpler for a first run:
+# enable_waf       = false
+# enable_guardrail = false
+# enable_dashboard = false

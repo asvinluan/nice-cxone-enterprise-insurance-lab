@@ -1,0 +1,9 @@
+number,name,brand,line,cisco_dialed_number_or_route,cxone_point_of_contact,cxone_script,wave,carrier_action,rollback_target,notes
++61355500101,KMH Claims,KMH,claims,DN 1300-CLAIMS-KMH -> UCCE route KMH_CLAIMS,KMH Claims,front_door,3,Re-point termination from Cisco SBC trunk group to CXone SIP trunk group,Cisco SBC trunk group A,High volume. 24x7. Move in wave 3 after servicing proves the platform.
++61355500102,KMH Servicing,KMH,servicing,DN KMH_SERVICING -> UCCE route KMH_SERV,KMH Servicing,front_door,2,Re-point termination,Cisco SBC trunk group A,"Business hours only: cut over on a Tuesday morning, not a Friday afternoon."
++61355500103,KMH Assistance,KMH,assistance,DN KMH_ASSIST -> UCCE route KMH_ASSIST,KMH Assistance,front_door,3,Re-point termination,Cisco SBC trunk group A,Roadside. Never cut over in bad weather or a holiday weekend.
++61355500104,CAT Hotline,KMH,cat,DN CAT_INFO -> UCCE route CAT_SURGE,CAT Hotline,front_door,1,Re-point termination,Cisco SBC trunk group A,Low normal volume. Perfect pilot number. Test the CAT switch here first.
++61355500105,KBU Broker,KBU,broker,DN KBU_BROKER -> UCCE route KBU_BRK,KBU Broker,front_door,2,Re-point termination,Cisco SBC trunk group A,"Small, skilled team. Brokers notice problems quickly: tell them before the cutover."
++61355500106,KRG Claims,KRG,claims,DN KRG_CLAIMS -> UCCE route KRG_CLM,KRG Claims,front_door,4,Re-point termination,Cisco SBC trunk group B,Regional. Check regional agents' network quality first.
++61355500107,KRG Servicing,KRG,servicing,DN KRG_SERV -> UCCE route KRG_SRV,KRG Servicing,front_door,4,Re-point termination,Cisco SBC trunk group B,Regional servicing.
++61355500108,Care Line,KMH,care,DN CARE -> UCCE route CARE,Care Line,front_door,2,Re-point termination,Cisco SBC trunk group A,Vulnerable customers. Cut over in business hours with the care team lead on the floor.

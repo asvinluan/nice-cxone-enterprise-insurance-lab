@@ -1,0 +1,98 @@
+# Studio script design: verify_caller  (a sub-script, called with Run)
+# Two-factor check: policy number AND postcode. Never confirms which one was wrong.
+script: verify_caller
+kind: subscript
+description: Asks for policy number and postcode, calls the verify API, returns verified/not verified.
+parameters: []
+outputs: [verified, careFlag, premiumAud, renewalDate]
+sensitiveVariables: [policyNumber, postcode]
+variables:
+  attempts: "0"
+  verified: "false"
+  careFlag: "false"
+nodes:
+  begin:
+    type: Begin
+    next: ask_policy
+  ask_policy:
+    type: Capture
+    prompt: "Please enter your eight digit policy number, then press hash."
+    variable: policyNumber
+    maxDigits: 8
+    minDigits: 8
+    timeoutSeconds: 10
+    mask: true
+    onTimeout: fail_path
+    onInvalid: retry
+    why: DTMF only (keypad). The number is never spoken, so it is not in a transcript. It is masked from logs and recordings handling.
+    next: ask_postcode
+  ask_postcode:
+    type: Capture
+    prompt: "Now enter the four digit postcode where the policy is held."
+    variable: postcode
+    maxDigits: 4
+    minDigits: 4
+    timeoutSeconds: 10
+    mask: true
+    onTimeout: fail_path
+    onInvalid: retry
+    next: call_verify
+  call_verify:
+    type: RestApi
+    operation: policyVerify
+    timeoutSeconds: 6
+    failMode: closed
+    request:
+      policyNumber: "{policyNumber}"
+      postcode: "{postcode}"
+    response:
+      result: result
+      careFlag: careFlag
+      premiumAud: premiumAud
+      renewalDate: renewalDate
+    why: >
+      Timeout 6 s is under Studio's 10 s default so Studio gives up last, not first.
+      failMode closed: if the API is down the caller is NOT treated as verified.
+    branches:
+      ok: eval
+      error: fail_path
+  eval:
+    type: Case
+    variable: result
+    branches:
+      verified: ok_path
+      not_verified: retry
+      locked: locked_path
+      default: fail_path
+  retry:
+    type: Snippet
+    action: increment
+    variable: attempts
+    why: Two tries, then a person. A third try helps a guesser more than a customer.
+    next: retry_check
+  retry_check:
+    type: Case
+    variable: attempts
+    branches:
+      "1": ask_policy
+      default: fail_path
+  locked_path:
+    type: Play
+    text: "For your security we can't check that here. Let me connect you to a person."
+    why: Same wording as the not-verified path on purpose. No hint about why.
+    next: end_unverified
+  fail_path:
+    type: Play
+    text: "I couldn't check those details here. Let me connect you to a person."
+    next: end_unverified
+  ok_path:
+    type: Snippet
+    action: set
+    assign: { verified: "true" }
+    next: end_verified
+  end_verified:
+    type: Return
+    outputs: { verified: "true" }
+  end_unverified:
+    type: Return
+    outputs: { verified: "false" }

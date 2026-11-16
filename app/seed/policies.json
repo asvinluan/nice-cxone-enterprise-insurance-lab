@@ -1,0 +1,6 @@
+[
+  {"policy_number": "40000001", "postcode": "3000", "premium_cents": 128450, "renewal_date": "2026-12-01", "brand": "Kestrel Motor and Home", "care_flag": false},
+  {"policy_number": "40000002", "postcode": "3220", "premium_cents": 96210, "renewal_date": "2027-02-14", "brand": "Kestrel Motor and Home", "care_flag": true},
+  {"policy_number": "40000003", "postcode": "3350", "premium_cents": 254300, "renewal_date": "2026-11-20", "brand": "Kestrel Regional", "care_flag": false},
+  {"policy_number": "40000004", "postcode": "3121", "premium_cents": 1875000, "renewal_date": "2027-01-05", "brand": "Kestrel Business", "care_flag": false}
+]

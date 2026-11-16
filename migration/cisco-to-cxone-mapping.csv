@@ -1,0 +1,16 @@
+cisco_concept,cxone_concept,what_changes,gotcha_or_risk
+"ICM/UCCE routing script (call type, dialed number)",Studio script + Point of Contact,"One script per use case, not per number. Number-specific behaviour moves to point-of-contact parameters.","Scripts are not convertible by a tool. Rebuild from the REQUIREMENT, not from the Cisco flow."
+Call Type,Point of Contact / skill + script branch,"Reporting by call type must be rebuilt on skill, point of contact and disposition.",Historic call-type reports will not match. Agree report definitions with the business BEFORE cutover.
+Skill group / precision queue,Skill (queue) + team membership with proficiency,Proficiency is lower-number-is-better in CXone (verify in your tenant).,Do not copy Cisco proficiency numbers across.
+Agent desk settings / reason codes,"Unavailable codes, ACW, dispositions",Wrap-up reasons become dispositions.,Cisco reason code numbers drive reports. Map every one.
+CVP VXML application / micro-apps,"Studio actions (Play, Menu, Capture, REST API)",IVR logic is rebuilt. External calls become REST API actions.,VXML audio files need re-recording or re-encoding. Check codec and prompt format.
+CVP external VXML server / database dip,Studio REST API action to API Gateway + Lambda,"Same job, different shape: 10 s default timeout, 32 KB limit, 2 automatic retries.",Make writes idempotent. Retries will happen.
+Finesse desktop gadgets,CXone Agent (MAX) and Agent Embedded / CRM screen pop,Screen pop uses contact data from the script.,Gadgets do not move. List every gadget and its owner.
+Time of day / Day of week node,Hours of Operation profile + Hours action,Holidays are on the profile.,A missing holiday means the line is OPEN on a public holiday. Test holidays.
+Emergency / alternate routing flag,Emergency flag on an Hours profile (the CAT switch),One flag moves all lines.,Run a CAT drill in the pilot wave.
+Call recording (CUBE/MediaSense or similar),CXone recording (and optional masking / pause-resume),Retention and access rules move to CXone plus the archive bucket.,Recordings of old calls stay on the old platform. Plan legal-hold access.
+Reporting (Unified Intelligence Center),CXone reporting + Enlighten analytics + exports,Real-time boards and historic reports are rebuilt.,Data warehouse feeds break. Find every consumer of the old reports.
+Workforce management (e.g. WFO),CXone WFM or the existing WFM tool via integration,Forecast history may not be transferable.,Staffing models must be re-baselined after cutover.
+SBC / CUBE and SIP trunks (carrier side),CXone SIP trunks / BYOC through the carrier,Numbers are re-pointed by the carrier. This is the real cutover control.,Carrier lead time can be days. Book change windows early. Rehearse the roll-back call to the carrier.
+Outbound dialer,CXone outbound,"Compliance rules (do-not-call, calling hours) must be rebuilt.",Do not migrate outbound in the same wave as inbound.
+Agent PCs / headsets / network QoS,"Browser/softphone WebRTC, or SIP endpoints",Network quality now matters at the agent site.,"Test from the real agent network, including home workers."

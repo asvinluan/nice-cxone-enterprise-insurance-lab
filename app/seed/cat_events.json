@@ -1,0 +1,5 @@
+[
+  {"postcode": "3000", "event_name": "Fictional storm exercise", "priority_boost": 5},
+  {"postcode": "3220", "event_name": "Fictional storm exercise", "priority_boost": 8},
+  {"postcode": "3350", "event_name": "Fictional bushfire exercise", "priority_boost": 10}
+]

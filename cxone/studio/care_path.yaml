@@ -1,0 +1,56 @@
+# Studio script design: care_path
+# Customers in hardship or difficult circumstances. No hurdles, no menus.
+script: care_path
+kind: subscript
+description: Direct, low-friction route to the specialist care team. No verification before a person answers.
+parameters: []
+sensitiveVariables: []
+variables: {}
+nodes:
+  begin:
+    type: Begin
+    next: hours_care
+  hours_care:
+    type: Hours
+    profile: KI Care
+    branches:
+      open: greet
+      closed: closed_msg
+      holiday: closed_msg
+      emergency: greet
+  greet:
+    type: Play
+    text: "Thanks for calling. We'll connect you to someone who can help. There is no need to have any details ready."
+    why: >
+      A customer in hardship should not face a menu, a PIN or a quiz. Verification happens
+      AFTER a person answers, by that person, with judgment.
+    next: queue_care
+  queue_care:
+    type: Reqagent
+    skill: Vulnerable and Hardship
+    timeoutSeconds: 240
+    onTimeout: callback
+    next: done
+  closed_msg:
+    type: Play
+    text: "Our care team is closed right now. It is open every day from 8am to 8pm. We'll note that you called and arrange a call back."
+    next: log_case
+  log_case:
+    type: RestApi
+    operation: crmCase
+    timeoutSeconds: 6
+    failMode: open
+    request:
+      idempotencyKey: "{contactId}-care"
+      category: hardship
+      priority: high
+      summary: "Caller reached the care line out of hours. Call back requested."
+      interactionId: "{contactId}"
+    branches:
+      ok: callback
+      error: callback
+  callback:
+    type: QueueCallback
+    next: done
+  done:
+    type: Return

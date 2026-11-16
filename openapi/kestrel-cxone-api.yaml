@@ -1,0 +1,235 @@
+openapi: 3.0.3
+info:
+  title: Kestrel CXone integration API (lab)
+  version: 1.0.0
+  description: |
+    The contract between NICE CXone Studio "REST API" actions and the AWS
+    API Gateway + Lambda layer. Everything is fictional.
+
+    Rules that every call follows (read these first):
+    1. Business outcomes are HTTP 200 with a result field. "Not verified" is a
+       NORMAL answer, not an error. This keeps Studio's circuit breaker quiet.
+    2. 4xx means the caller sent bad input. 5xx means we failed. Studio must
+       treat both as "go to the safe path" (a person, or a retry later).
+    3. Replies are small (well under Studio's 32 KB response limit) and fast
+       (Studio's default timeout is 10 s; every function here is set lower).
+    4. No personal data is ever written to logs.
+    5. Writes carry an idempotencyKey. Studio retries failed calls twice.
+servers:
+  - url: https://{apiId}.execute-api.ap-southeast-2.amazonaws.com/{stage}
+    variables:
+      apiId: { default: REPLACE_ME }
+      stage: { default: v1 }
+security:
+  - apiKey: []
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: x-api-key
+  schemas:
+    Postcode: { type: string, pattern: '^[0-9]{4}$', example: '3000' }
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error: { enum: [invalid_input, pii_in_summary, empty_body, bad_json, internal] }
+        field: { type: string, example: postcode }
+  responses:
+    BadRequest:
+      description: Input did not pass validation. Contains the field name, never the value.
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    ServerError:
+      description: Something failed on our side. Studio must go to the safe path.
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+paths:
+  /policy/verify:
+    post:
+      operationId: policyVerify
+      summary: Two-factor policy check (number + postcode)
+      description: |
+        Same answer for "no such policy" and "wrong postcode". Repeated
+        failures lock that number for a period. Locked is also a 200.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [policyNumber, postcode]
+              properties:
+                policyNumber: { type: string, pattern: '^[0-9]{8}$', example: '40000001' }
+                postcode: { $ref: '#/components/schemas/Postcode' }
+      responses:
+        '200':
+          description: Outcome
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [result]
+                properties:
+                  result: { enum: [verified, not_verified, locked] }
+                  premiumAud: { type: string, example: '1284.50' }
+                  renewalDate: { type: string, example: '2026-12-01' }
+                  brand: { type: string }
+                  careFlag: { type: boolean }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '500': { $ref: '#/components/responses/ServerError' }
+  /claims/status:
+    post:
+      operationId: claimStatus
+      summary: Claim status (claim number + postcode)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [claimNumber, postcode]
+              properties:
+                claimNumber: { type: string, pattern: '^9[0-9]{9}$', example: '9000000001' }
+                postcode: { $ref: '#/components/schemas/Postcode' }
+      responses:
+        '200':
+          description: Outcome
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [result]
+                properties:
+                  result: { enum: [found, not_verified, locked] }
+                  status: { type: string }
+                  nextStep: { type: string }
+                  careFlag: { type: boolean }
+                  catEvent: { type: boolean }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '500': { $ref: '#/components/responses/ServerError' }
+  /crm/cases:
+    post:
+      operationId: crmCase
+      summary: Create a case (safe to repeat)
+      description: |
+        The case id is derived from idempotencyKey. Sending the same key again
+        returns result=duplicate with the same caseId and creates nothing.
+        A summary that contains a card number or tax file number is refused (422).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [idempotencyKey, category, summary]
+              properties:
+                idempotencyKey: { type: string, pattern: '^[A-Za-z0-9-]{8,64}$' }
+                category: { enum: [claim_lodged, claim_status, policy_change, complaint, hardship, vulnerable, roadside, other] }
+                priority: { enum: [low, normal, high, urgent], default: normal }
+                summary: { type: string, maxLength: 300 }
+                interactionId: { type: string, maxLength: 64 }
+                policyNumber: { type: string, pattern: '^[0-9]{8}$' }
+      responses:
+        '201':
+          description: Created
+          content: { application/json: { schema: { type: object, properties: { result: { enum: [created] }, caseId: { type: string } } } } }
+        '200':
+          description: Already existed (a retry)
+          content: { application/json: { schema: { type: object, properties: { result: { enum: [duplicate] }, caseId: { type: string } } } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '422':
+          description: Summary contained sensitive numbers. Nothing was stored.
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+        '500': { $ref: '#/components/responses/ServerError' }
+  /cat/check:
+    post:
+      operationId: catCheck
+      summary: Is this postcode in a declared catastrophe area?
+      description: A bad or missing postcode answers "not in area". It never errors, because a call must go on.
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, properties: { postcode: { type: string } } } } }
+      responses:
+        '200':
+          description: Outcome
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [inEventArea, eventName, priorityBoost]
+                properties:
+                  inEventArea: { type: boolean }
+                  eventName: { type: string }
+                  priorityBoost: { type: integer }
+        '500': { $ref: '#/components/responses/ServerError' }
+  /guard:
+    post:
+      operationId: guard
+      summary: Check text before (input) or after (output) an AI model
+      description: |
+        Layer 1 is local code (card numbers, tax file numbers, known attack
+        phrases). Layer 2 is the Bedrock guardrail. If anything fails, the
+        answer is block. Blocking is a 200 with action=block.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [direction, text]
+              properties:
+                direction: { enum: [input, output] }
+                text: { type: string, maxLength: 2000 }
+                groundingSource: { type: string, maxLength: 4000 }
+                query: { type: string, maxLength: 2000 }
+      responses:
+        '200':
+          description: Outcome
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [action, text, reasons, result]
+                properties:
+                  action: { enum: [allow, mask, block] }
+                  text: { type: string }
+                  reasons: { type: array, items: { type: string } }
+                  result: { enum: [ok, error] }
+                  mode: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '500': { $ref: '#/components/responses/ServerError' }
+  /ai/answer:
+    post:
+      operationId: aiAnswer
+      summary: Answer a general question from the approved knowledge text
+      description: Bedrock Converse with the guardrail attached. Fails closed.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [question]
+              properties:
+                question: { type: string, maxLength: 500 }
+      responses:
+        '200':
+          description: Outcome
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, answer, reason]
+                properties:
+                  status: { enum: [answered, blocked, error] }
+                  answer: { type: string }
+                  reason: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '500': { $ref: '#/components/responses/ServerError' }
+  /health:
+    get:
+      operationId: health
+      summary: Is the integration layer up?
+      responses:
+        '200': { description: ok }
+        '503': { description: degraded }

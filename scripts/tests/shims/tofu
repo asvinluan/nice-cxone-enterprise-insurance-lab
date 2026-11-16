@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Test stand-in for tofu. Records what it was asked and prints canned outputs.
+echo "tofu $*" >> "${SHIM_LOG:?}"
+case "$1" in
+  output)
+    case "$*" in
+      *"-json table_names"*) echo '{"policies":"ki-policies","claims":"ki-claims","cases":"ki-cases","attempts":"ki-attempts","cat_events":"ki-cat-events"}' ;;
+      *"-raw api_url"*) echo "https://example.invalid/v1" ;;
+      *"-raw api_key_value"*) echo "shim-api-key" ;;
+      *) echo "unknown output" >&2; exit 1 ;;
+    esac ;;
+  plan) for a in "$@"; do case "$a" in -out=*) : > "${a#-out=}" ;; esac; done; echo "Plan: 3 to add, 0 to change, 0 to destroy." ;;
+  version) echo "OpenTofu v1.0.0-shim" ;;
+esac
+exit 0

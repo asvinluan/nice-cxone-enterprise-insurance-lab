@@ -1,0 +1,53 @@
+# Studio script design: cat_surge
+# Used when the CAT switch (the Emergency flag on profile "KI CAT Switch") is on.
+script: cat_surge
+kind: subscript
+description: Catastrophe mode. Event message first, safety first, callback instead of long waits, CAT queue.
+parameters: []
+sensitiveVariables: [postcode]
+variables:
+  priorityBoost: "0"
+nodes:
+  begin:
+    type: Begin
+    next: event_message
+  event_message:
+    type: Play
+    text: "We are experiencing very high call volumes because of a severe weather event. If anyone is hurt or in danger, hang up and call triple zero. Claims can also be lodged on our website."
+    why: Tell people the truth early, point to the faster channel, and put safety first.
+    next: ask_postcode
+  ask_postcode:
+    type: Capture
+    prompt: "To help us prioritise your call, enter the four digit postcode where the damage happened, or press hash to skip."
+    variable: postcode
+    maxDigits: 4
+    minDigits: 0
+    timeoutSeconds: 8
+    mask: true
+    onTimeout: queue_cat
+    onInvalid: queue_cat
+    next: cat_lookup
+  cat_lookup:
+    type: RestApi
+    operation: catCheck
+    timeoutSeconds: 3
+    failMode: open
+    request: { postcode: "{postcode}" }
+    response: { inEventArea: inEventArea, priorityBoost: priorityBoost }
+    why: A shorter timeout than normal. In an event every second of IVR time is a second not spent answering.
+    branches:
+      ok: queue_cat
+      error: queue_cat
+  queue_cat:
+    type: Reqagent
+    skill: CAT Surge
+    priorityVariable: priorityBoost
+    timeoutSeconds: 90
+    onTimeout: callback
+    why: Callback after 90 seconds, not 180. In an event, a promised call back is a better service than a long wait.
+    next: done
+  callback:
+    type: QueueCallback
+    next: done
+  done:
+    type: Return

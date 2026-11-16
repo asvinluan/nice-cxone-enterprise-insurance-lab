@@ -1,0 +1,5 @@
+[
+  {"claim_number": "9000000001", "postcode": "3000", "status": "Assessing", "next_step": "An assessor will contact you within two business days.", "care_flag": false, "cat_event": false},
+  {"claim_number": "9000000002", "postcode": "3220", "status": "Approved for repair", "next_step": "Your repairer will contact you to book the work.", "care_flag": true, "cat_event": true},
+  {"claim_number": "9000000003", "postcode": "3350", "status": "Waiting for information", "next_step": "We need photos of the damage. A person will call you to help.", "care_flag": false, "cat_event": true}
+]

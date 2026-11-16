@@ -1,0 +1,11 @@
+id,risk,likelihood,impact,early_warning,mitigation,owner_role
+R01,Carrier change window is late or missed,M,H,No confirmed ticket 5 business days before,Book windows at wave planning; agree an emergency change path; rehearse roll-back,Carrier manager
+R02,Cisco logic nobody remembers is missed in the rebuild,H,H,Requirements workshops find 'we always did X' items late,Rebuild from requirements; observe live calls; shadow period; parallel run on low-risk numbers,Solution architect
+R03,Agents not ready,M,H,Low pass rate in the training assessment,Role-based training; floor walkers; hypercare; keep Cisco open for roll-back until stable,Operations manager
+R04,Reporting differences cause disputes,H,M,Daily numbers differ between old and new,Agree report definitions before the pilot; run both for one week,Reporting lead
+R05,Integration latency breaks the IVR,M,H,API p95 above 2 s in test,Timeouts under Studio's limit; fail modes decided per call; load test before wave 3,Integration lead
+R06,A catastrophe event lands in a cutover window,M,H,Weather warnings,Change freeze rule: no cutover when a severe weather warning is active; CAT switch tested in wave 1,Incident manager
+R07,Personal data reaches logs or recordings,L,H,Any hit in the log search,Keypad capture masked; no PII in logs by code and test; recording policy reviewed,Security lead
+R08,Material service provider obligations not met (APRA CPS 230),M,H,Register entry or exit plan missing at wave 1,"Register entry, notification, exit plan and tolerance levels before the pilot (verify current wording)",Risk manager
+R09,Regional agent network quality,M,M,High jitter in the network test,Test from real sites; QoS; softphone settings,Network lead
+R10,Vendor AI behaves differently after an update,M,M,Eval results change after a release,Fixed eval set run before and after each change; version-pinned guardrail,AI lead

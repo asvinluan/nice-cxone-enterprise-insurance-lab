@@ -1,0 +1,11 @@
+{
+  "name": "Kestrel Insurance (lab)",
+  "prefix": "KI",
+  "timezone": "Australia/Melbourne",
+  "note": "Everything here is fictional. Phone numbers are ACMA numbers reserved for drama and fiction (03 5550 xxxx). Your tenant's area and domain come from discovery at run time and are never typed into this file.",
+  "brands": [
+    { "code": "KMH", "name": "Kestrel Motor and Home", "audience": "retail customers" },
+    { "code": "KBU", "name": "Kestrel Business", "audience": "brokers and business customers" },
+    { "code": "KRG", "name": "Kestrel Regional", "audience": "regional retail customers" }
+  ]
+}

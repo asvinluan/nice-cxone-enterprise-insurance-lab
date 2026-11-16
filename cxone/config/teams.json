@@ -1,0 +1,141 @@
+{
+  "teams": [
+    {
+      "name": "Platform Support",
+      "description": "Platform administrators and support",
+      "skills": []
+    },
+    {
+      "name": "Quality",
+      "description": "Quality analysts",
+      "skills": []
+    },
+    {
+      "name": "Reporting",
+      "description": "Reporting analysts",
+      "skills": []
+    },
+    {
+      "name": "Claims Agents",
+      "description": "FNOL and motor claims agents",
+      "skills": [
+        {
+          "skill": "Claims FNOL",
+          "proficiency": 1
+        },
+        {
+          "skill": "Claims Motor",
+          "proficiency": 1
+        },
+        {
+          "skill": "Roadside Assistance",
+          "proficiency": 8
+        },
+        {
+          "skill": "Servicing General",
+          "proficiency": 12
+        }
+      ]
+    },
+    {
+      "name": "Claims Senior",
+      "description": "Senior claims agents, overflow tier",
+      "skills": [
+        {
+          "skill": "Claims FNOL",
+          "proficiency": 3
+        },
+        {
+          "skill": "Claims Motor",
+          "proficiency": 3
+        },
+        {
+          "skill": "Vulnerable and Hardship",
+          "proficiency": 10
+        }
+      ]
+    },
+    {
+      "name": "Servicing Agents",
+      "description": "Policy servicing agents",
+      "skills": [
+        {
+          "skill": "Servicing General",
+          "proficiency": 1
+        },
+        {
+          "skill": "Broker Desk",
+          "proficiency": 10
+        },
+        {
+          "skill": "Digital Messaging",
+          "proficiency": 10
+        }
+      ]
+    },
+    {
+      "name": "Assistance Agents",
+      "description": "Roadside assistance agents",
+      "skills": [
+        {
+          "skill": "Roadside Assistance",
+          "proficiency": 1
+        }
+      ]
+    },
+    {
+      "name": "Care Team",
+      "description": "Vulnerable and hardship specialists",
+      "skills": [
+        {
+          "skill": "Vulnerable and Hardship",
+          "proficiency": 1
+        }
+      ]
+    },
+    {
+      "name": "Complaints Team",
+      "description": "Internal dispute resolution",
+      "skills": [
+        {
+          "skill": "Complaints IDR",
+          "proficiency": 1
+        }
+      ]
+    },
+    {
+      "name": "CAT Surge Pool",
+      "description": "Agents who move to the CAT queue in an event",
+      "skills": [
+        {
+          "skill": "CAT Surge",
+          "proficiency": 1
+        },
+        {
+          "skill": "Claims FNOL",
+          "proficiency": 15
+        }
+      ]
+    },
+    {
+      "name": "Digital Agents",
+      "description": "Messaging agents",
+      "skills": [
+        {
+          "skill": "Digital Messaging",
+          "proficiency": 1
+        }
+      ]
+    },
+    {
+      "name": "Broker Desk Team",
+      "description": "Broker and business desk",
+      "skills": [
+        {
+          "skill": "Broker Desk",
+          "proficiency": 1
+        }
+      ]
+    }
+  ]
+}

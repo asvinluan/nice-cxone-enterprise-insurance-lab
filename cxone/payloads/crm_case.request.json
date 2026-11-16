@@ -1,0 +1,8 @@
+{
+  "idempotencyKey": "lab-0001-claim-lodged",
+  "category": "claim_lodged",
+  "priority": "normal",
+  "summary": "Caller reported minor hail damage to roof. No injuries.",
+  "interactionId": "lab-contact-0001",
+  "policyNumber": "40000001"
+}

@@ -1,0 +1,100 @@
+{
+  "pointsOfContact": [
+    {
+      "name": "KMH Claims",
+      "number": "+61355500101",
+      "brand": "KMH",
+      "script": "front_door",
+      "hoursProfile": "KI 24x7",
+      "parameters": {
+        "brandName": "Kestrel Motor and Home",
+        "line": "claims"
+      },
+      "description": "Retail claims line"
+    },
+    {
+      "name": "KMH Servicing",
+      "number": "+61355500102",
+      "brand": "KMH",
+      "script": "front_door",
+      "hoursProfile": "KI Servicing",
+      "parameters": {
+        "brandName": "Kestrel Motor and Home",
+        "line": "servicing"
+      },
+      "description": "Retail servicing line"
+    },
+    {
+      "name": "KMH Assistance",
+      "number": "+61355500103",
+      "brand": "KMH",
+      "script": "front_door",
+      "hoursProfile": "KI 24x7",
+      "parameters": {
+        "brandName": "Kestrel Motor and Home",
+        "line": "assistance"
+      },
+      "description": "Roadside assistance line"
+    },
+    {
+      "name": "CAT Hotline",
+      "number": "+61355500104",
+      "brand": "KMH",
+      "script": "front_door",
+      "hoursProfile": "KI 24x7",
+      "parameters": {
+        "brandName": "Kestrel Insurance",
+        "line": "cat"
+      },
+      "description": "Event information line, used in a catastrophe"
+    },
+    {
+      "name": "KBU Broker",
+      "number": "+61355500105",
+      "brand": "KBU",
+      "script": "front_door",
+      "hoursProfile": "KI Broker",
+      "parameters": {
+        "brandName": "Kestrel Business",
+        "line": "broker"
+      },
+      "description": "Broker and business desk"
+    },
+    {
+      "name": "KRG Claims",
+      "number": "+61355500106",
+      "brand": "KRG",
+      "script": "front_door",
+      "hoursProfile": "KI 24x7",
+      "parameters": {
+        "brandName": "Kestrel Regional",
+        "line": "claims"
+      },
+      "description": "Regional claims line"
+    },
+    {
+      "name": "KRG Servicing",
+      "number": "+61355500107",
+      "brand": "KRG",
+      "script": "front_door",
+      "hoursProfile": "KI Servicing",
+      "parameters": {
+        "brandName": "Kestrel Regional",
+        "line": "servicing"
+      },
+      "description": "Regional servicing line"
+    },
+    {
+      "name": "Care Line",
+      "number": "+61355500108",
+      "brand": "KMH",
+      "script": "front_door",
+      "hoursProfile": "KI Care",
+      "parameters": {
+        "brandName": "Kestrel Insurance",
+        "line": "care"
+      },
+      "description": "Direct line to the care team"
+    }
+  ]
+}

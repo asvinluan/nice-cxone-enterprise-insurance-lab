@@ -1,0 +1,195 @@
+{
+  "proficiencyNote": "Lower number = more skilled in CXone (1 is best, 20 is lowest). Verify in your tenant before relying on it.",
+  "campaign": "Kestrel Inbound",
+  "skills": [
+    {
+      "name": "Claims FNOL",
+      "kind": "queue",
+      "mediaType": "Voice",
+      "division": "Claims",
+      "primaryTeam": "Claims Agents",
+      "overflow": [
+        {
+          "afterSeconds": 60,
+          "team": "Claims Senior"
+        },
+        {
+          "afterSeconds": 180,
+          "team": "CAT Surge Pool"
+        }
+      ],
+      "slaPercent": 80,
+      "slaSeconds": 30,
+      "acwSeconds": 60,
+      "record": true,
+      "description": "First notice of loss"
+    },
+    {
+      "name": "Claims Motor",
+      "kind": "queue",
+      "mediaType": "Voice",
+      "division": "Claims",
+      "primaryTeam": "Claims Agents",
+      "overflow": [
+        {
+          "afterSeconds": 90,
+          "team": "Claims Senior"
+        }
+      ],
+      "slaPercent": 80,
+      "slaSeconds": 60,
+      "acwSeconds": 90,
+      "record": true,
+      "description": "Motor claim in progress"
+    },
+    {
+      "name": "Servicing General",
+      "kind": "queue",
+      "mediaType": "Voice",
+      "division": "Servicing",
+      "primaryTeam": "Servicing Agents",
+      "overflow": [
+        {
+          "afterSeconds": 120,
+          "team": "Claims Agents"
+        }
+      ],
+      "slaPercent": 80,
+      "slaSeconds": 60,
+      "acwSeconds": 45,
+      "record": true,
+      "description": "Policy changes, renewals, payments"
+    },
+    {
+      "name": "Roadside Assistance",
+      "kind": "queue",
+      "mediaType": "Voice",
+      "division": "Claims",
+      "primaryTeam": "Assistance Agents",
+      "overflow": [
+        {
+          "afterSeconds": 30,
+          "team": "Claims Agents"
+        }
+      ],
+      "slaPercent": 90,
+      "slaSeconds": 20,
+      "acwSeconds": 30,
+      "record": true,
+      "description": "Breakdown and tow"
+    },
+    {
+      "name": "Vulnerable and Hardship",
+      "kind": "queue",
+      "mediaType": "Voice",
+      "division": "Care",
+      "primaryTeam": "Care Team",
+      "overflow": [
+        {
+          "afterSeconds": 120,
+          "team": "Claims Senior"
+        }
+      ],
+      "slaPercent": 90,
+      "slaSeconds": 30,
+      "acwSeconds": 120,
+      "record": true,
+      "description": "Specialist care team"
+    },
+    {
+      "name": "Complaints IDR",
+      "kind": "queue",
+      "mediaType": "Voice",
+      "division": "Care",
+      "primaryTeam": "Complaints Team",
+      "overflow": [],
+      "slaPercent": 80,
+      "slaSeconds": 120,
+      "acwSeconds": 180,
+      "record": true,
+      "description": "Internal dispute resolution"
+    },
+    {
+      "name": "CAT Surge",
+      "kind": "queue",
+      "mediaType": "Voice",
+      "division": "Claims",
+      "primaryTeam": "CAT Surge Pool",
+      "overflow": [
+        {
+          "afterSeconds": 120,
+          "team": "Claims Agents"
+        }
+      ],
+      "slaPercent": 70,
+      "slaSeconds": 120,
+      "acwSeconds": 60,
+      "record": true,
+      "description": "Catastrophe event claims"
+    },
+    {
+      "name": "Broker Desk",
+      "kind": "queue",
+      "mediaType": "Voice",
+      "division": "Servicing",
+      "primaryTeam": "Broker Desk Team",
+      "overflow": [
+        {
+          "afterSeconds": 120,
+          "team": "Servicing Agents"
+        }
+      ],
+      "slaPercent": 85,
+      "slaSeconds": 45,
+      "acwSeconds": 60,
+      "record": true,
+      "description": "Brokers and business customers"
+    },
+    {
+      "name": "Digital Messaging",
+      "kind": "queue",
+      "mediaType": "Chat",
+      "division": "Servicing",
+      "primaryTeam": "Digital Agents",
+      "overflow": [
+        {
+          "afterSeconds": 180,
+          "team": "Servicing Agents"
+        }
+      ],
+      "slaPercent": 80,
+      "slaSeconds": 120,
+      "acwSeconds": 30,
+      "record": false,
+      "description": "Web chat"
+    },
+    {
+      "name": "Language Mandarin",
+      "kind": "language",
+      "mediaType": "Voice",
+      "division": "Servicing",
+      "primaryTeam": "",
+      "overflow": [],
+      "slaPercent": 0,
+      "slaSeconds": 0,
+      "acwSeconds": 0,
+      "record": false,
+      "description": "Attribute skill: caller asked for Mandarin"
+    },
+    {
+      "name": "Language Vietnamese",
+      "kind": "language",
+      "mediaType": "Voice",
+      "division": "Servicing",
+      "primaryTeam": "",
+      "overflow": [],
+      "slaPercent": 0,
+      "slaSeconds": 0,
+      "acwSeconds": 0,
+      "record": false,
+      "description": "Attribute skill: caller asked for Vietnamese"
+    }
+  ],
+  "languageNote": "Language skills are attribute skills. A team leader assigns them to individual bilingual agents, not to whole teams.",
+  "overflowNote": "Design intent. CXone does not hold overflow rules on the skill itself. They are built in Studio as a second Reqagent after a timeout. The lab Studio designs use a callback after the timeout; chaining the overflow queues is a listed next step. The apply script does not send this field."
+}

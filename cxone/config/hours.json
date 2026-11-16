@@ -1,0 +1,260 @@
+{
+  "profiles": [
+    {
+      "name": "KI 24x7",
+      "description": "Claims and assistance: every day, around the clock",
+      "timezone": "Australia/Melbourne",
+      "days": {
+        "Mon": [
+          [
+            "00:00",
+            "24:00"
+          ]
+        ],
+        "Tue": [
+          [
+            "00:00",
+            "24:00"
+          ]
+        ],
+        "Wed": [
+          [
+            "00:00",
+            "24:00"
+          ]
+        ],
+        "Thu": [
+          [
+            "00:00",
+            "24:00"
+          ]
+        ],
+        "Fri": [
+          [
+            "00:00",
+            "24:00"
+          ]
+        ],
+        "Sat": [
+          [
+            "00:00",
+            "24:00"
+          ]
+        ],
+        "Sun": [
+          [
+            "00:00",
+            "24:00"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "KI Servicing",
+      "description": "Policy servicing: business days, 8am to 6pm Melbourne time",
+      "timezone": "Australia/Melbourne",
+      "days": {
+        "Mon": [
+          [
+            "08:00",
+            "18:00"
+          ]
+        ],
+        "Tue": [
+          [
+            "08:00",
+            "18:00"
+          ]
+        ],
+        "Wed": [
+          [
+            "08:00",
+            "18:00"
+          ]
+        ],
+        "Thu": [
+          [
+            "08:00",
+            "18:00"
+          ]
+        ],
+        "Fri": [
+          [
+            "08:00",
+            "18:00"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "KI Broker",
+      "description": "Broker desk: business days, 8:30am to 5:30pm Melbourne time",
+      "timezone": "Australia/Melbourne",
+      "days": {
+        "Mon": [
+          [
+            "08:30",
+            "17:30"
+          ]
+        ],
+        "Tue": [
+          [
+            "08:30",
+            "17:30"
+          ]
+        ],
+        "Wed": [
+          [
+            "08:30",
+            "17:30"
+          ]
+        ],
+        "Thu": [
+          [
+            "08:30",
+            "17:30"
+          ]
+        ],
+        "Fri": [
+          [
+            "08:30",
+            "17:30"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "KI Care",
+      "description": "Care team: every day, 8am to 8pm Melbourne time",
+      "timezone": "Australia/Melbourne",
+      "days": {
+        "Mon": [
+          [
+            "08:00",
+            "20:00"
+          ]
+        ],
+        "Tue": [
+          [
+            "08:00",
+            "20:00"
+          ]
+        ],
+        "Wed": [
+          [
+            "08:00",
+            "20:00"
+          ]
+        ],
+        "Thu": [
+          [
+            "08:00",
+            "20:00"
+          ]
+        ],
+        "Fri": [
+          [
+            "08:00",
+            "20:00"
+          ]
+        ],
+        "Sat": [
+          [
+            "08:00",
+            "20:00"
+          ]
+        ],
+        "Sun": [
+          [
+            "08:00",
+            "20:00"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "KI CAT Switch",
+      "description": "Never closes. Its EMERGENCY flag is the catastrophe switch: on means CAT mode",
+      "timezone": "Australia/Melbourne",
+      "days": {
+        "Mon": [
+          [
+            "00:00",
+            "24:00"
+          ]
+        ],
+        "Tue": [
+          [
+            "00:00",
+            "24:00"
+          ]
+        ],
+        "Wed": [
+          [
+            "00:00",
+            "24:00"
+          ]
+        ],
+        "Thu": [
+          [
+            "00:00",
+            "24:00"
+          ]
+        ],
+        "Fri": [
+          [
+            "00:00",
+            "24:00"
+          ]
+        ],
+        "Sat": [
+          [
+            "00:00",
+            "24:00"
+          ]
+        ],
+        "Sun": [
+          [
+            "00:00",
+            "24:00"
+          ]
+        ]
+      }
+    }
+  ],
+  "holidays": [
+    {
+      "name": "Melbourne Cup Day",
+      "date": "2026-11-03",
+      "closes": [
+        "KI Servicing",
+        "KI Broker"
+      ]
+    },
+    {
+      "name": "Christmas Day",
+      "date": "2026-12-25",
+      "closes": [
+        "KI Servicing",
+        "KI Broker"
+      ]
+    },
+    {
+      "name": "Boxing Day",
+      "date": "2026-12-26",
+      "closes": [
+        "KI Servicing",
+        "KI Broker"
+      ]
+    },
+    {
+      "name": "New Years Day",
+      "date": "2027-01-01",
+      "closes": [
+        "KI Servicing",
+        "KI Broker"
+      ]
+    }
+  ],
+  "catSwitchProfile": "KI CAT Switch"
+}

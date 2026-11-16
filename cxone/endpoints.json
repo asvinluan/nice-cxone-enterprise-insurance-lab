@@ -1,0 +1,126 @@
+{
+  "_readme": "Every NICE CXone API path used by the scripts is listed HERE and nowhere else. Paths marked verify=true were written from the public documentation pattern and have NOT been run against a real tenant. Run scripts/*/verify-endpoints first (read-only) and correct this file if a path differs. Never put your tenant name, area, domain, access key or secret in this file.",
+  "discovery": {
+    "tenantLookup": {
+      "method": "GET",
+      "url": "https://cxone.niceincontact.com/.well-known/cxone-configuration",
+      "query": "tenantId={tenantId}",
+      "verify": true,
+      "returns": [
+        "area",
+        "domain",
+        "auth_endpoint",
+        "api_endpoint"
+      ]
+    },
+    "token": {
+      "method": "POST",
+      "path": "/auth/token",
+      "verify": true,
+      "grant": "password with access key (lab) -- production should use a dedicated least-privilege API user",
+      "bodyFields": [
+        "grant_type",
+        "username",
+        "password",
+        "client_id",
+        "client_secret"
+      ]
+    }
+  },
+  "admin": {
+    "version": "v27.0",
+    "base": "{apiEndpoint}/incontactapi/services/{version}",
+    "resources": {
+      "skills": {
+        "list": "GET /skills",
+        "create": "POST /skills",
+        "delete": "DELETE /skills/{id}",
+        "listKey": "skills",
+        "idField": "skillId",
+        "nameField": "skillName",
+        "verify": true
+      },
+      "teams": {
+        "list": "GET /teams",
+        "create": "POST /teams",
+        "delete": "DELETE /teams/{id}",
+        "listKey": "teams",
+        "idField": "teamId",
+        "nameField": "teamName",
+        "verify": true
+      },
+      "teamSkills": {
+        "assign": "POST /teams/{teamId}/skills",
+        "verify": true
+      },
+      "hoursOfOperation": {
+        "list": "GET /hours-of-operation",
+        "create": "POST /hours-of-operation",
+        "delete": "DELETE /hours-of-operation/{id}",
+        "listKey": "hoursOfOperationProfiles",
+        "idField": "profileId",
+        "nameField": "profileName",
+        "verify": true,
+        "update": "PUT /hours-of-operation/{id}",
+        "addHoliday": "POST /hours-of-operation/{id}/holidays"
+      },
+      "dispositions": {
+        "list": "GET /dispositions",
+        "create": "POST /dispositions",
+        "delete": "DELETE /dispositions/{id}",
+        "listKey": "dispositions",
+        "idField": "dispositionId",
+        "nameField": "dispositionName",
+        "verify": true
+      },
+      "unavailableCodes": {
+        "list": "GET /unavailable-codes",
+        "create": "POST /unavailable-codes",
+        "delete": "DELETE /unavailable-codes/{id}",
+        "listKey": "unavailableCodes",
+        "idField": "unavailableCodeId",
+        "nameField": "unavailableCodeName",
+        "verify": true
+      },
+      "pointsOfContact": {
+        "list": "GET /points-of-contact",
+        "create": "POST /points-of-contact",
+        "delete": "DELETE /points-of-contact/{id}",
+        "listKey": "pointsOfContact",
+        "idField": "pointOfContactId",
+        "nameField": "pointOfContactName",
+        "verify": true
+      },
+      "campaigns": {
+        "list": "GET /campaigns",
+        "listKey": "campaigns",
+        "idField": "campaignId",
+        "nameField": "campaignName",
+        "verify": true
+      }
+    }
+  },
+  "studio": {
+    "_note": "Studio scripts are imported and saved in the Studio application. Treat the YAML specs in cxone/studio as the reviewed design and the exported script as the artefact. There is no endpoint here on purpose.",
+    "import": "manual"
+  },
+  "recording": {
+    "mask": {
+      "method": "POST",
+      "path": "/contacts/{contactId}/recording/mask",
+      "verify": true
+    },
+    "unmask": {
+      "method": "POST",
+      "path": "/contacts/{contactId}/recording/unmask",
+      "verify": true
+    }
+  },
+  "state": {
+    "_note": "Desired-state config is applied by NAME. Apply never deletes. Destroy only removes objects whose name starts with the lab prefix and which exist in the config.",
+    "prefix": "KI"
+  },
+  "_labMarker": "[kestrel-lab]",
+  "_labMarkerNote": "Every object created by apply gets this text added to its description. Destroy refuses to delete anything that does not carry it. That is the guard against deleting a real object that happens to share a name.",
+  "_discoveryOverrideEnv": "CXONE_DISCOVERY_URL (tests and mock only)"
+}

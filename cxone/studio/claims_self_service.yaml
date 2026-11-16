@@ -1,0 +1,161 @@
+# Studio script design: claims_self_service
+# Two jobs: lodge a new claim (fnol) or check a claim (status).
+script: claims_self_service
+kind: subscript
+description: First notice of loss with CAT priority, and claim status lookup. Both fall back to a person.
+parameters: [mode]
+sensitiveVariables: [claimNumber, postcode]
+variables:
+  priorityBoost: "0"
+  priority: normal
+nodes:
+  begin:
+    type: Begin
+    next: mode_router
+  mode_router:
+    type: Case
+    variable: mode
+    branches:
+      fnol: fnol_safety
+      status: status_claim_no
+      default: queue_claims
+  # ---------------------------------------------------------------- FNOL
+  fnol_safety:
+    type: Play
+    text: "If anyone is hurt or in danger, hang up now and call triple zero."
+    next: fnol_postcode
+  fnol_postcode:
+    type: Capture
+    prompt: "Enter the four digit postcode where the damage happened."
+    variable: postcode
+    maxDigits: 4
+    minDigits: 4
+    timeoutSeconds: 10
+    mask: true
+    onTimeout: queue_claims
+    onInvalid: queue_claims
+    next: fnol_cat
+  fnol_cat:
+    type: RestApi
+    operation: catCheck
+    timeoutSeconds: 4
+    failMode: open
+    request: { postcode: "{postcode}" }
+    response: { inEventArea: inEventArea, eventName: eventName, priorityBoost: priorityBoost }
+    why: >
+      failMode open on purpose. A CAT lookup only adds priority. If it fails, the caller
+      still gets in line at normal priority. Failing closed here would punish the customer
+      for our outage. (Compare: verify_caller fails CLOSED because it guards money and data.)
+    branches:
+      ok: fnol_priority
+      error: fnol_case
+  fnol_priority:
+    type: Case
+    variable: inEventArea
+    branches:
+      "true": fnol_set_high
+      default: fnol_case
+  fnol_set_high:
+    type: Snippet
+    action: set
+    assign: { priority: high }
+    next: fnol_case
+  fnol_case:
+    type: RestApi
+    operation: crmCase
+    timeoutSeconds: 6
+    failMode: open
+    request:
+      idempotencyKey: "{contactId}-fnol"
+      category: claim_lodged
+      priority: "{priority}"
+      summary: "Caller asked to lodge a new claim by phone."
+      interactionId: "{contactId}"
+    response: { caseId: caseId }
+    why: >
+      idempotencyKey is built from the contact id, so Studio's two automatic retries
+      cannot create a second case. The summary is fixed text, never caller words, so
+      no personal data can reach the CRM from this step.
+    branches:
+      ok: queue_fnol
+      error: queue_fnol
+  queue_fnol:
+    type: Reqagent
+    skill: Claims FNOL
+    priorityVariable: priorityBoost
+    timeoutSeconds: 180
+    onTimeout: callback
+    why: The CAT priority boost moves affected callers up the line. It does not move them to a different queue.
+    next: done
+  # ---------------------------------------------------------------- STATUS
+  status_claim_no:
+    type: Capture
+    prompt: "Enter your ten digit claim number, then press hash."
+    variable: claimNumber
+    maxDigits: 10
+    minDigits: 10
+    timeoutSeconds: 12
+    mask: true
+    onTimeout: queue_claims
+    onInvalid: queue_claims
+    next: status_postcode
+  status_postcode:
+    type: Capture
+    prompt: "Enter the four digit postcode of the claim."
+    variable: postcode
+    maxDigits: 4
+    minDigits: 4
+    timeoutSeconds: 10
+    mask: true
+    onTimeout: queue_claims
+    onInvalid: queue_claims
+    next: status_call
+  status_call:
+    type: RestApi
+    operation: claimStatus
+    timeoutSeconds: 6
+    failMode: closed
+    request: { claimNumber: "{claimNumber}", postcode: "{postcode}" }
+    response: { result: result, status: status, nextStep: nextStep, careFlag: careFlag }
+    branches:
+      ok: status_eval
+      error: queue_claims
+  status_eval:
+    type: Case
+    variable: result
+    branches:
+      found: status_care_check
+      default: status_fail
+  status_care_check:
+    type: Case
+    variable: careFlag
+    why: A claim flagged for care goes to the care team without making the customer ask.
+    branches:
+      "true": queue_care
+      default: status_read
+  status_read:
+    type: Play
+    text: "Your claim status is {status}. The next step is: {nextStep}. To speak to someone, stay on the line."
+    why: The words come from the approved fields returned by the API. Studio does not compose claim advice itself.
+    next: queue_claims
+  status_fail:
+    type: Play
+    text: "I couldn't check those details here. Let me connect you to a person."
+    next: queue_claims
+  queue_claims:
+    type: Reqagent
+    skill: Claims Motor
+    timeoutSeconds: 180
+    onTimeout: callback
+    next: done
+  queue_care:
+    type: Reqagent
+    skill: Vulnerable and Hardship
+    timeoutSeconds: 240
+    onTimeout: callback
+    next: done
+  callback:
+    type: QueueCallback
+    next: done
+  done:
+    type: Return

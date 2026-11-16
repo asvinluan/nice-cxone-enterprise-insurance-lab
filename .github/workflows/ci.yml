@@ -1,0 +1,85 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  repo-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml jsonschema python-hcl2 pytest
+      - name: Repo safety and consistency checks
+        run: python3 tools/check_repo.py
+      - name: Checker self-tests (does it really catch mistakes?)
+        run: python3 -m pytest tools -q
+      - name: Integration function tests
+        run: python3 -m pytest app -q
+      - name: AI guard evals (local layer; the Bedrock layer needs a deployed lab)
+        run: python3 tools/run_ai_eval.py
+
+  shell-scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml
+      - name: shellcheck
+        run: shellcheck -x scripts/bash/*.sh scripts/tests/*.sh scripts/tests/shims/*
+      - name: Bash scripts against the local mock
+        run: bash scripts/tests/test_cxone_scripts.sh bash
+      - name: AWS scripts with stand-in tools
+        run: bash scripts/tests/test_aws_scripts.sh bash
+
+  powershell-scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml
+      - name: PowerShell 7 scripts against the local mock
+        shell: bash
+        run: |
+          bash scripts/tests/test_cxone_scripts.sh pwsh
+          bash scripts/tests/test_aws_scripts.sh pwsh
+
+  windows-powershell-5-1-parse:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse every script with Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          $bad = 0
+          Get-ChildItem scripts\powershell\*.ps1 | ForEach-Object {
+            $e = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$e)
+            if ($e) { $bad++; Write-Host "FAIL $($_.Name)"; $e | ForEach-Object { Write-Host $_.Message } } else { Write-Host "OK $($_.Name)" }
+          }
+          if ($bad -gt 0) { exit 1 }
+
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - uses: actions/checkout@v4
+      - uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: "1.8.5"
+      - run: tofu fmt -check -recursive
+      - run: tofu init -backend=false -input=false
+      - run: tofu validate

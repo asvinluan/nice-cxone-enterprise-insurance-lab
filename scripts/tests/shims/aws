@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Test stand-in for the AWS CLI. Records the call. A file://path argument is
+# replaced by the file's contents so tests can see what would have been sent.
+line="aws"
+for a in "$@"; do
+  case "$a" in file://*) a="$(tr -d '\r\n' < "${a#file://}")" ;; esac
+  line="$line $a"
+done
+echo "$line" >> "${SHIM_LOG:?}"
+exit 0

@@ -1,0 +1,49 @@
+{
+  "dispositions": [
+    {
+      "name": "Claim Lodged",
+      "description": "A new claim was lodged",
+      "classification": "Resolved"
+    },
+    {
+      "name": "Claim Status Given",
+      "description": "Caller was told the claim status",
+      "classification": "Resolved"
+    },
+    {
+      "name": "Policy Changed",
+      "description": "A policy change was made",
+      "classification": "Resolved"
+    },
+    {
+      "name": "Assistance Sent",
+      "description": "Roadside assistance dispatched",
+      "classification": "Resolved"
+    },
+    {
+      "name": "Vulnerable Customer",
+      "description": "Caller flagged as vulnerable",
+      "classification": "Care"
+    },
+    {
+      "name": "Hardship",
+      "description": "Financial hardship raised",
+      "classification": "Care"
+    },
+    {
+      "name": "Complaint",
+      "description": "Complaint logged for internal dispute resolution",
+      "classification": "Care"
+    },
+    {
+      "name": "Information Only",
+      "description": "General information given",
+      "classification": "Resolved"
+    },
+    {
+      "name": "Transferred",
+      "description": "Transferred elsewhere",
+      "classification": "Transferred"
+    }
+  ]
+}

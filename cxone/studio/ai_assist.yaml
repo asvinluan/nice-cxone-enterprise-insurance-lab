@@ -1,0 +1,117 @@
+# Studio script design: ai_assist
+# General questions answered from approved text, with a guardrail on BOTH sides.
+script: ai_assist
+kind: subscript
+description: AI self-service for general questions. Input guard, model, output guard, then a person on any doubt.
+parameters: []
+sensitiveVariables: []
+variables:
+  turns: "0"
+nodes:
+  begin:
+    type: Begin
+    next: ask
+  ask:
+    type: Capture
+    mode: speech
+    prompt: "What would you like to know? For example, our opening hours or how to lodge a claim."
+    variable: question
+    maxChars: 500
+    timeoutSeconds: 8
+    onTimeout: escalate
+    onInvalid: escalate
+    why: >
+      Speech capture is allowed here ONLY because this path never handles policy or claim
+      numbers. The guard below still blocks any number that slips through.
+    next: guard_in
+  guard_in:
+    type: RestApi
+    operation: guard
+    timeoutSeconds: 6
+    failMode: closed
+    request: { direction: input, text: "{question}" }
+    response: { action: action }
+    why: Check the customer's words BEFORE a model sees them. Cards, tax numbers and attack phrases stop here.
+    branches:
+      ok: guard_in_eval
+      error: escalate
+  guard_in_eval:
+    type: Case
+    variable: action
+    branches:
+      allow: model
+      default: blocked
+  model:
+    type: RestApi
+    operation: aiAnswer
+    timeoutSeconds: 8
+    failMode: closed
+    request: { question: "{question}" }
+    response: { status: status, answer: answer }
+    why: Bedrock Converse with the guardrail attached. Timeout 8 s, under Studio's 10 s.
+    branches:
+      ok: model_eval
+      error: escalate
+  model_eval:
+    type: Case
+    variable: status
+    branches:
+      answered: guard_out
+      default: escalate
+  guard_out:
+    type: RestApi
+    operation: guard
+    timeoutSeconds: 6
+    failMode: closed
+    request: { direction: output, text: "{answer}", query: "{question}" }
+    response: { action: action, text: safeText }
+    why: Check the model's words BEFORE the customer hears them. This is where grounding is checked.
+    branches:
+      ok: guard_out_eval
+      error: escalate
+  guard_out_eval:
+    type: Case
+    variable: action
+    branches:
+      allow: speak
+      mask: speak
+      default: escalate
+  speak:
+    type: Play
+    text: "{safeText}"
+    next: more
+  more:
+    type: Snippet
+    action: increment
+    variable: turns
+    next: more_check
+  more_check:
+    type: Case
+    variable: turns
+    why: Three questions, then a person. A long chat with a bot is a sign the bot is not helping.
+    branches:
+      "3": escalate
+      default: again
+  again:
+    type: Menu
+    prompt: "To ask another question, press 1. To speak to a person, press 0."
+    timeoutSeconds: 6
+    options: { "1": ask, "0": escalate }
+    onTimeout: escalate
+    onInvalid: escalate
+  blocked:
+    type: Play
+    text: "Sorry, I can't help with that here. I can connect you to a person."
+    next: escalate
+  escalate:
+    type: Reqagent
+    skill: Servicing General
+    timeoutSeconds: 180
+    onTimeout: callback
+    why: Every failure path ends at a person. The AI is an extra, never a gate.
+    next: done
+  callback:
+    type: QueueCallback
+    next: done
+  done:
+    type: Return

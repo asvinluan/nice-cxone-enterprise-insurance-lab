@@ -1,0 +1,12 @@
+# Copy to backend.tf ONLY for a shared or long-lived environment.
+# Create the bucket and lock table first (outside this repo), then:  tofu init -migrate-state
+terraform {
+  backend "s3" {
+    bucket         = "REPLACE-WITH-STATE-BUCKET"
+    key            = "nice-cxone-enterprise-insurance-lab/terraform.tfstate"
+    region         = "ap-southeast-2"
+    encrypt        = true
+    kms_key_id     = "alias/REPLACE-WITH-STATE-KEY"
+    dynamodb_table = "REPLACE-WITH-LOCK-TABLE"
+  }
+}
