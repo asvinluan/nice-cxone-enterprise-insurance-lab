@@ -1,3 +1,5 @@
+[![ci](https://github.com/asvinluan/nice-cxone-enterprise-insurance-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/asvinluan/nice-cxone-enterprise-insurance-lab/actions/workflows/ci.yml)
+
 # NICE CXone enterprise insurance lab (large insurer, telco carrier)
 
 A **lab** that shows how to design, build, test and migrate to NICE CXone for a large Australian general insurer, with a carrier in the middle and strict regulation around it. Everything is fictional ("Kestrel Insurance"). It is for learning and for interview discussion. It is not a customer deliverable and it has not been run against a customer tenant.
